@@ -1,1 +1,20 @@
-
+<post>
+    <title>Understanding Web Development Basics</title>
+    <content>
+        Web development encompasses a range of skills and technologies that are essential for building functional websites and applications. In this post, we'll explore the basics of HTML, CSS, and JavaScript.
+    </content>
+    <thumbnail>https://example.com/thumbnail1.jpg</thumbnail>
+    <hashtags>
+        webdevelopment, programming, html, css, javascript
+    </hashtags>
+    <seo>
+        <description>Learn the fundamentals of web development, including HTML, CSS, and JavaScript.</description>
+        <keywords>web development, HTML, CSS, JavaScript, web programming</keywords>
+    </seo>
+    <category>Programming</category>
+    <author>Likhon Sheikh</author>
+    <date>2024-12-25</date>
+    <views>200</views>
+    <likes>50</likes>
+    <comments>10</comments>
+</post>
