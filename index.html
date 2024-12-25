@@ -19,6 +19,14 @@
         h1 {
             text-align: center;
         }
+        .thumbnail {
+            max-width: 100%;
+            height: auto;
+        }
+        .seo {
+            font-style: italic;
+            color: gray;
+        }
     </style>
 </head>
 <body>
@@ -28,34 +36,57 @@
     <script>
         async function loadPosts() {
             const postsContainer = document.getElementById('posts-container');
+            
+            // List of XML files in the posts directory
+            const postFiles = [
+                'post1.xml',
+                'post2.xml',
+                'post3.xml'
+            ];
 
-            // Fetch the list of XML files from the posts folder
             try {
-                const response = await fetch('./posts/'); // Adjust this based on your server setup
-                if (!response.ok) {
-                    throw new Error('Failed to load posts directory');
-                }
-                const parser = new DOMParser();
-                const htmlDoc = parser.parseFromString(await response.text(), 'text/html');
-                const links = Array.from(htmlDoc.querySelectorAll('a[href$=".xml"]'));
-                
-                for (const link of links) {
-                    const fileName = link.getAttribute('href');
+                for (const fileName of postFiles) {
                     const filePath = `./posts/${fileName}`;
                     
                     // Fetch and display each XML file
                     const xmlResponse = await fetch(filePath);
+                    if (!xmlResponse.ok) {
+                        throw new Error(`Failed to load ${fileName}`);
+                    }
+
                     const xmlText = await xmlResponse.text();
+                    const parser = new DOMParser();
                     const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
 
                     // Parse the XML and render it
                     const postDiv = document.createElement('div');
                     postDiv.classList.add('post');
-                    
+
                     const title = xmlDoc.querySelector('title')?.textContent || 'No Title';
                     const content = xmlDoc.querySelector('content')?.textContent || 'No Content';
+                    const thumbnail = xmlDoc.querySelector('thumbnail')?.textContent || '';
+                    const hashtags = xmlDoc.querySelector('hashtags')?.textContent || '';
+                    const seoDescription = xmlDoc.querySelector('seo > description')?.textContent || '';
+                    const seoKeywords = xmlDoc.querySelector('seo > keywords')?.textContent || '';
+                    const category = xmlDoc.querySelector('category')?.textContent || 'Uncategorized';
+                    const author = xmlDoc.querySelector('author')?.textContent || 'Unknown';
+                    const date = xmlDoc.querySelector('date')?.textContent || 'Unknown Date';
+                    const views = xmlDoc.querySelector('views')?.textContent || '0';
+                    const likes = xmlDoc.querySelector('likes')?.textContent || '0';
+                    const comments = xmlDoc.querySelector('comments')?.textContent || '0';
 
-                    postDiv.innerHTML = `<h2>${title}</h2><p>${content}</p>`;
+                    postDiv.innerHTML = `
+                        <h2>${title}</h2>
+                        <img class="thumbnail" src="${thumbnail}" alt="${title}">
+                        <p>${content}</p>
+                        <p class="seo">Description: ${seoDescription}</p>
+                        <p class="seo">Keywords: ${seoKeywords}</p>
+                        <p>Category: ${category}</p>
+                        <p>Author: ${author} | Date: ${date}</p>
+                        <p>Views: ${views} | Likes: ${likes} | Comments: ${comments}</p>
+                        <p>Hashtags: ${hashtags}</p>
+                    `;
+
                     postsContainer.appendChild(postDiv);
                 }
             } catch (error) {
