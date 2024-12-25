@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Post Loader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .post {
+            border: 1px solid #ddd;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        h1 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Posts</h1>
+    <div id="posts-container"></div>
+
+    <script>
+        async function loadPosts() {
+            const postsContainer = document.getElementById('posts-container');
+
+            // Fetch the list of XML files from the posts folder
+            try {
+                const response = await fetch('./posts/'); // Adjust this based on your server setup
+                if (!response.ok) {
+                    throw new Error('Failed to load posts directory');
+                }
+                const parser = new DOMParser();
+                const htmlDoc = parser.parseFromString(await response.text(), 'text/html');
+                const links = Array.from(htmlDoc.querySelectorAll('a[href$=".xml"]'));
+                
+                for (const link of links) {
+                    const fileName = link.getAttribute('href');
+                    const filePath = `./posts/${fileName}`;
+                    
+                    // Fetch and display each XML file
+                    const xmlResponse = await fetch(filePath);
+                    const xmlText = await xmlResponse.text();
+                    const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+
+                    // Parse the XML and render it
+                    const postDiv = document.createElement('div');
+                    postDiv.classList.add('post');
+                    
+                    const title = xmlDoc.querySelector('title')?.textContent || 'No Title';
+                    const content = xmlDoc.querySelector('content')?.textContent || 'No Content';
+
+                    postDiv.innerHTML = `<h2>${title}</h2><p>${content}</p>`;
+                    postsContainer.appendChild(postDiv);
+                }
+            } catch (error) {
+                postsContainer.innerHTML = `<p>Error loading posts: ${error.message}</p>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadPosts);
+    </script>
+</body>
+</html>
